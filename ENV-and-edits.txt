@@ -1,0 +1,4 @@
+Add to .env.local (never commit it), then restart npm run dev:
+BREVO_API_KEY=your_brevo_api_key
+PARTNER_NOTIFY_EMAIL=where-you-want-applications@example.com
+PARTNER_FROM_EMAIL=a-sender-verified-in-brevo@example.com

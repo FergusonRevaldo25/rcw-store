@@ -1,26 +1,104 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Brand colours (same in both modes) */
+:root {
+  --rcw-purple: #7c3aed;
+  --rcw-pink: #ec4899;
+  --rcw-orange: #f97316;
+}
+
+/* Light mode */
+:root {
+  --bg: #ffffff;
+  --surface: #f4f4f5;
+  --text: #09090b;
+  --muted: #52525b;
+  --border: rgba(0, 0, 0, 0.1);
+  --header: rgba(255, 255, 255, 0.9);
+  --menu: #f4f4f5;
+  --hover: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.25);
+  --btn-bg: #09090b;
+  --btn-fg: #ffffff;
+  --dim: #a1a1aa;
+}
+
+/* Dark mode */
+.dark {
+  --bg: #07060b;
+  --surface: rgba(255, 255, 255, 0.05);
+  --text: #ffffff;
+  --muted: #a1a1aa;
+  --border: rgba(255, 255, 255, 0.1);
+  --header: rgba(7, 6, 11, 0.9);
+  --menu: #100e17;
+  --hover: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.25);
+  --btn-bg: #ffffff;
+  --btn-fg: #000000;
+  --dim: #71717a;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.rcw-gradient-text {
+  background: linear-gradient(
+    90deg,
+    var(--rcw-purple),
+    var(--rcw-pink),
+    var(--rcw-orange)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.rcw-gradient-bg {
+  background: linear-gradient(
+    90deg,
+    var(--rcw-purple),
+    var(--rcw-pink),
+    var(--rcw-orange)
+  );
+}
+
+.rcw-glow {
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
+}
+/* Branded scrollbar (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #7c3aed, #d946ef, #f97316);
+  border: 3px solid var(--bg);
+  border-radius: 999px;
+  min-height: 48px;
+}
+::-webkit-scrollbar-thumb:hover {
+  filter: brightness(1.15);
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) var(--bg);
+  }
 }
