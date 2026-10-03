@@ -74,12 +74,14 @@ function IconLink({
   label,
   count = 0,
   onClick,
+  className = "",
   children,
 }: {
   href: string;
   label: string;
   count?: number;
   onClick?: () => void;
+  className?: string;
   children: ReactNode;
 }) {
   const badge = count > 99 ? "99+" : String(count);
@@ -92,7 +94,7 @@ function IconLink({
           ? `${label}, ${count} ${count === 1 ? "item" : "items"}`
           : label
       }
-      className={`relative flex items-center gap-2 rounded-lg border border-[var(--border)] px-2.5 py-2 text-sm text-[var(--text)] transition-colors hover:bg-[var(--hover)] ${focus}`}
+      className={`relative flex items-center gap-2 rounded-lg border border-[var(--border)] px-2.5 py-2 text-sm text-[var(--text)] transition-colors hover:bg-[var(--hover)] ${focus} ${className}`}
     >
       {children}
       <span className="hidden lg:inline">{label}</span>
@@ -356,6 +358,8 @@ export default function Navbar() {
     };
   }, [drawerOpen]);
 
+  const drawerLink = `flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--text)] hover:bg-[var(--hover)] ${focus}`;
+
   return (
     <>
       {/* Promo banner (clickable) */}
@@ -378,15 +382,15 @@ export default function Navbar() {
 
       <header
         ref={wrapRef}
-        className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--header)] backdrop-blur"
+        className="sticky top-0 z-50 w-full max-w-full border-b border-[var(--border)] bg-[var(--header)] backdrop-blur"
       >
         {/* Row 1: logo, search (desktop), actions */}
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-6">
           <Link
             href="/"
             onClick={closeAll}
             aria-label="RCW Store home"
-            className={`flex shrink-0 items-center gap-2.5 rounded-full ${focus}`}
+            className={`flex min-w-0 shrink-0 items-center gap-2.5 rounded-full ${focus}`}
           >
             <Image
               src="/logo.png"
@@ -394,9 +398,10 @@ export default function Navbar() {
               width={40}
               height={40}
               priority
-              className="h-10 w-10 rounded-full border border-[var(--border-strong)] object-cover"
+              className="h-10 w-10 shrink-0 rounded-full border border-[var(--border-strong)] object-cover"
             />
-            <span className="text-xl font-bold rcw-gradient-text">
+            {/* Hidden on very small phones so the row cannot overflow */}
+            <span className="hidden text-xl font-bold rcw-gradient-text min-[400px]:inline">
               RCW Store
             </span>
           </Link>
@@ -406,23 +411,29 @@ export default function Navbar() {
             className="hidden max-w-xl flex-1 md:block"
           />
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            {/* Favourites, Orders and Account move into the menu on phones */}
             <IconLink
               href="/favourites"
               label="Favourites"
               count={favouritesCount}
+              className="hidden sm:flex"
             >
               <Icon>
                 <path d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.65-9.5 9-9.5 9z" />
               </Icon>
             </IconLink>
-            <IconLink href="/orders" label="Orders">
+            <IconLink href="/orders" label="Orders" className="hidden sm:flex">
               <Icon>
                 <path d="M21 8l-9-5-9 5v8l9 5 9-5V8z" />
                 <path d="M3 8l9 5 9-5M12 13v8" />
               </Icon>
             </IconLink>
-            <IconLink href="/account" label="Account">
+            <IconLink
+              href="/account"
+              label="Account"
+              className="hidden sm:flex"
+            >
               <Icon>
                 <circle cx="12" cy="8" r="4" />
                 <path d="M4 21a8 8 0 0 1 16 0" />
@@ -450,7 +461,7 @@ export default function Navbar() {
         </div>
 
         {/* Row 2 (mobile): search */}
-        <div className="px-4 pb-3 md:hidden">
+        <div className="px-3 pb-3 md:hidden">
           <SearchBar onSearch={closeAll} />
         </div>
 
@@ -527,13 +538,35 @@ export default function Navbar() {
         {drawerOpen && (
           <nav
             id="mobile-categories"
-            aria-label="Categories"
+            aria-label="Menu"
             className="max-h-[65dvh] overflow-y-auto border-t border-[var(--border)] bg-[var(--menu)] px-3 py-3 md:hidden"
           >
+            {/* Shown only below 640px, where the header icons are hidden */}
+            <div className="mb-2 grid gap-1 border-b border-[var(--border)] pb-2 sm:hidden">
+              <Link
+                href="/favourites"
+                onClick={closeAll}
+                className={drawerLink}
+              >
+                <span>Favourites</span>
+                {favouritesCount > 0 && (
+                  <span className="rounded-full bg-[var(--hover)] px-2 py-0.5 text-xs text-[var(--muted)]">
+                    {favouritesCount > 99 ? "99+" : favouritesCount}
+                  </span>
+                )}
+              </Link>
+              <Link href="/orders" onClick={closeAll} className={drawerLink}>
+                Orders
+              </Link>
+              <Link href="/account" onClick={closeAll} className={drawerLink}>
+                Account
+              </Link>
+            </div>
+
             <Link
               href="/partner"
               onClick={closeAll}
-              className={`mb-2 flex rounded-lg px-3 py-2.5 text-sm font-semibold text-[var(--text)] hover:bg-[var(--hover)] ${focus}`}
+              className={`mb-2 ${drawerLink} font-semibold`}
             >
               Sell with us
             </Link>
