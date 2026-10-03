@@ -1,5 +1,6 @@
 "use client";
 import ThemeToggle from "@/components/ThemeToggle";
+import UserMenu from "@/components/UserMenu";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -94,7 +95,7 @@ function IconLink({
           ? `${label}, ${count} ${count === 1 ? "item" : "items"}`
           : label
       }
-      className={`relative flex items-center gap-2 rounded-lg border border-[var(--border)] px-2.5 py-2 text-sm text-[var(--text)] transition-colors hover:bg-[var(--hover)] ${focus} ${className}`}
+      className={`relative flex h-10 items-center gap-2 rounded-lg border border-[var(--border)] px-2.5 text-sm text-[var(--text)] transition-colors hover:bg-[var(--hover)] ${focus} ${className}`}
     >
       {children}
       <span className="hidden lg:inline">{label}</span>
@@ -412,7 +413,7 @@ export default function Navbar() {
           />
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-            {/* Favourites, Orders and Account move into the menu on phones */}
+            {/* Favourites and Orders move into the menu on phones */}
             <IconLink
               href="/favourites"
               label="Favourites"
@@ -429,16 +430,9 @@ export default function Navbar() {
                 <path d="M3 8l9 5 9-5M12 13v8" />
               </Icon>
             </IconLink>
-            <IconLink
-              href="/account"
-              label="Account"
-              className="hidden sm:flex"
-            >
-              <Icon>
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 21a8 8 0 0 1 16 0" />
-              </Icon>
-            </IconLink>
+
+            <UserMenu />
+
             <IconLink href="/cart" label="Cart" count={cartCount}>
               <Icon>
                 <path d="M3 4h2l2.4 11h10.2L20 7H6" />
@@ -541,7 +535,7 @@ export default function Navbar() {
             aria-label="Menu"
             className="max-h-[65dvh] overflow-y-auto border-t border-[var(--border)] bg-[var(--menu)] px-3 py-3 md:hidden"
           >
-            {/* Shown only below 640px, where the header icons are hidden */}
+            {/* Shown only below 640px, where those header icons are hidden */}
             <div className="mb-2 grid gap-1 border-b border-[var(--border)] pb-2 sm:hidden">
               <Link
                 href="/favourites"
@@ -557,9 +551,6 @@ export default function Navbar() {
               </Link>
               <Link href="/orders" onClick={closeAll} className={drawerLink}>
                 Orders
-              </Link>
-              <Link href="/account" onClick={closeAll} className={drawerLink}>
-                Account
               </Link>
             </div>
 
