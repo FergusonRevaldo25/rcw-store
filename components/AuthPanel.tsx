@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { authClient } from "@/lib/auth/client";
+import TwoFactorStep from "@/components/TwoFactorStep";
 
 type Mode = "sign-in" | "sign-up";
 
@@ -32,6 +33,7 @@ export default function AuthPanel({
   headingLevel?: 1 | 2;
 }) {
   const [error, setError] = useState("");
+  const [needCode, setNeedCode] = useState(false);
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
   const up = mode === "sign-up";
@@ -60,12 +62,23 @@ export default function AuthPanel({
     if (res.error) {
       setError(
         res.error.message ??
-          (up ? "Could not create your account." : "Could not sign you in.")
+          (up ? "Could not create your account." : "Could not sign you in."),
       );
       return;
     }
+
+    // Accounts with two-factor on must enter a code before they are signed in.
+    const needsSecondStep = (res.data as { twoFactorRedirect?: boolean } | null)
+      ?.twoFactorRedirect;
+    if (!up && needsSecondStep) {
+      setNeedCode(true);
+      return;
+    }
+
     onDone();
   }
+
+  if (needCode) return <TwoFactorStep onDone={onDone} />;
 
   return (
     <div>
@@ -98,9 +111,7 @@ export default function AuthPanel({
         {up ? "Create your account" : "Welcome back"}
       </H>
       <p className="mt-1 text-sm text-[var(--muted)]">
-        {up
-          ? "It only takes a minute."
-          : "Sign in to your RCW Store account."}
+        {up ? "It only takes a minute." : "Sign in to your RCW Store account."}
       </p>
 
       <form onSubmit={submit} noValidate className="mt-6 space-y-4">
@@ -209,7 +220,7 @@ export default function AuthPanel({
         <p className="text-[var(--muted)]">
           Want to sell on RCW Store?{" "}
           <Link
-            href="/partner"
+            href="/sell"
             onClick={onNavigate}
             className={`rounded font-semibold text-[var(--text)] underline underline-offset-2 ${focus}`}
           >

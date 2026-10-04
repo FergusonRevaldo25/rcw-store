@@ -12,6 +12,10 @@ import { STARTER_ROLES } from "../rbac/roles";
 async function main() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not set in .env.local");
+
+  // Show which database this will write to (host only, never the password).
+  console.log(`Seeding host: ${new URL(url).host}`);
+
   const db = drizzle(neon(url));
 
   await db
@@ -44,16 +48,18 @@ async function main() {
       .from(roles)
       .where(eq(roles.key, def.key));
 
-    await db
-      .insert(rolePermissions)
-      .values(
-        def.permissions.map((permissionKey) => ({
-          roleId: row.id,
-          permissionKey,
-          scope: "all" as const,
-        }))
-      )
-      .onConflictDoNothing();
+    if (def.permissions.length > 0) {
+      await db
+        .insert(rolePermissions)
+        .values(
+          def.permissions.map((permissionKey) => ({
+            roleId: row.id,
+            permissionKey,
+            scope: "all" as const,
+          })),
+        )
+        .onConflictDoNothing();
+    }
 
     console.log(`Role: ${def.name} (${def.permissions.length} permissions)`);
   }
