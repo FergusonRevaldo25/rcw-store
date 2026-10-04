@@ -83,6 +83,11 @@ export default async function SellerPage() {
           <Link href="/account" className={btn}>
             Back to my account
           </Link>
+          {seller.status === "approved" && (
+            <Link href="/seller/products" className={btn}>
+              Manage my products
+            </Link>
+          )}
         </div>
       </div>
     </main>
