@@ -20,13 +20,22 @@ export default function TwoFactorSetup() {
 
   async function start(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const password = String(new FormData(e.currentTarget).get("password") ?? "");
+    const password = String(
+      new FormData(e.currentTarget).get("password") ?? "",
+    );
     if (!password) return setError("Enter your password.");
     setError("");
     setBusy(true);
     const res = await authClient.twoFactor.enable({ password });
     setBusy(false);
-    if (res.error || !res.data) return setError(res.error?.message ?? "Could not start setup.");
+    if (res.error || !res.data) {
+      return setError(res.error?.message ?? "Could not start setup.");
+    }
+    if (res.data.method !== "totp") {
+      return setError(
+        "Authenticator app setup is not available. Please contact support.",
+      );
+    }
     setUri(res.data.totpURI);
     setCodes(res.data.backupCodes);
   }
@@ -39,7 +48,9 @@ export default function TwoFactorSetup() {
     setBusy(true);
     const res = await authClient.twoFactor.verifyTotp({ code });
     setBusy(false);
-    if (res.error) return setError(res.error.message ?? "That code did not work.");
+    if (res.error) {
+      return setError(res.error.message ?? "That code did not work.");
+    }
     router.push("/admin");
     router.refresh();
   }
@@ -48,12 +59,23 @@ export default function TwoFactorSetup() {
     return (
       <form onSubmit={start} noValidate className="mt-6 space-y-4">
         <div>
-          <label htmlFor="tf-pass" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
+          <label
+            htmlFor="tf-pass"
+            className="mb-1.5 block text-sm font-medium text-[var(--text)]"
+          >
             Confirm your password
           </label>
-          <input id="tf-pass" name="password" type="password" autoComplete="current-password" className={`${field} ${focus}`} />
+          <input
+            id="tf-pass"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            className={`${field} ${focus}`}
+          />
         </div>
-        <div role="alert" className="min-h-5 text-sm text-red-500">{error}</div>
+        <div role="alert" className="min-h-5 text-sm text-red-500">
+          {error}
+        </div>
         <button type="submit" disabled={busy} className={primary}>
           {busy ? "Please wait..." : "Start setup"}
         </button>
@@ -65,7 +87,8 @@ export default function TwoFactorSetup() {
     <div className="mt-6 space-y-6">
       <div>
         <p className="text-sm text-[var(--text)]">
-          1. Scan this with an authenticator app (Google Authenticator, Microsoft Authenticator, Authy).
+          1. Scan this with an authenticator app (Google Authenticator,
+          Microsoft Authenticator, Authy).
         </p>
         <div className="mt-3 inline-block rounded-xl bg-white p-3">
           <QRCodeSVG value={uri} size={176} />
@@ -74,21 +97,35 @@ export default function TwoFactorSetup() {
 
       <div>
         <p className="text-sm text-[var(--text)]">
-          2. Save these backup codes somewhere safe. They are shown once. Each works one time if you lose your phone.
+          2. Save these backup codes somewhere safe. They are shown once. Each
+          works one time if you lose your phone.
         </p>
         <ul className="mt-3 grid grid-cols-2 gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 font-mono text-sm text-[var(--text)]">
-          {codes.map((c) => <li key={c}>{c}</li>)}
+          {codes.map((c) => (
+            <li key={c}>{c}</li>
+          ))}
         </ul>
       </div>
 
       <form onSubmit={confirm} noValidate className="space-y-4">
         <div>
-          <label htmlFor="tf-verify" className="mb-1.5 block text-sm font-medium text-[var(--text)]">
+          <label
+            htmlFor="tf-verify"
+            className="mb-1.5 block text-sm font-medium text-[var(--text)]"
+          >
             3. Enter the 6-digit code from the app
           </label>
-          <input id="tf-verify" name="code" inputMode="numeric" autoComplete="one-time-code" className={`${field} ${focus}`} />
+          <input
+            id="tf-verify"
+            name="code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            className={`${field} ${focus}`}
+          />
         </div>
-        <div role="alert" className="min-h-5 text-sm text-red-500">{error}</div>
+        <div role="alert" className="min-h-5 text-sm text-red-500">
+          {error}
+        </div>
         <button type="submit" disabled={busy} className={primary}>
           {busy ? "Checking..." : "Turn on two-factor"}
         </button>
