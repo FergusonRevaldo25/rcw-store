@@ -22,9 +22,7 @@ const columns = [
     title: "Company Info",
     links: [
       { label: "About RCW", href: "/about" },
-      { label: "Featured Brands", href: "/brands" },
       { label: "Great Deals SA", href: "/deals" },
-      { label: "Careers", href: "/careers" },
       { label: "Sell on RCW", href: "/partner/sell-products" },
       { label: "Become a partner", href: "/partner" },
       { label: "Influencers", href: "/partner/influencer" },
@@ -34,11 +32,9 @@ const columns = [
     title: "Help & Support",
     links: [
       { label: "Shipping Info", href: "/shipping" },
-      { label: "Returns", href: "/returns" },
-      { label: "Refunds", href: "/refunds" },
+      { label: "Returns & Refunds", href: "/returns" },
       { label: "How To Order", href: "/how-to-order" },
       { label: "Track Order", href: "/track-order" },
-      { label: "Size Guide", href: "/size-guide" },
     ],
   },
   {
@@ -46,7 +42,6 @@ const columns = [
     links: [
       { label: "Contact Us", href: "/contact" },
       { label: "Payment Methods", href: "/payments" },
-      { label: "Rewards", href: "/rewards" },
       { label: "FAQ", href: "/faq" },
     ],
   },
@@ -569,7 +564,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            <Newsletter />
+            {/* Newsletter hidden until email sending is set up */}
 
             <div>
               <Heading>We accept</Heading>

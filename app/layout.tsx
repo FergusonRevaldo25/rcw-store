@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import SiteChrome from "@/components/SiteChrome";
 import ThemeProvider from "@/components/ThemeProvider";
+import { getLiveSlugsForChrome } from "@/lib/catalogue/categories";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,14 +42,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const liveSlugs = await getLiveSlugsForChrome();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider>
-          <Providers>
+          <Providers liveSlugs={liveSlugs}>
             <SiteChrome>{children}</SiteChrome>
           </Providers>
         </ThemeProvider>

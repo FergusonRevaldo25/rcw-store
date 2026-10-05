@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { MotionConfig, motion } from "motion/react";
+import { useLiveCategories } from "@/components/LiveCategoriesProvider";
+
 import { categoryMeta, showcaseSlugs } from "@/lib/categoryMeta";
 
 const accents = [
@@ -26,6 +28,8 @@ const tile =
   "flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5 text-sm";
 
 export default function CategoryShowcase() {
+  const live = useLiveCategories();
+
   return (
     <MotionConfig reducedMotion="user">
       <section aria-labelledby="cats-heading">
@@ -46,9 +50,9 @@ export default function CategoryShowcase() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.5, delay: (i % 3) * 0.08 }}
-                whileHover={c.live ? { y: -4 } : undefined}
+                whileHover={live.has(c.slug) ? { y: -4 } : undefined}
                 className={`flex h-full flex-col rounded-2xl border p-5 transition-colors ${
-                  c.live
+                  live.has(c.slug)
                     ? "border-[var(--border-strong)] bg-[var(--surface)] hover:border-fuchsia-500/50"
                     : "border-[var(--border)] bg-[var(--surface)]"
                 }`}
@@ -57,23 +61,25 @@ export default function CategoryShowcase() {
                   aria-hidden="true"
                   className={`mb-4 h-1 w-12 rounded-full bg-gradient-to-r ${
                     accents[i % accents.length]
-                  } ${c.live ? "" : "opacity-40"}`}
+                  } ${live.has(c.slug) ? "" : "opacity-40"}`}
                 />
 
                 <header className="mb-4 flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <h3
                       className={`font-semibold ${
-                        c.live ? "text-[var(--text)]" : "text-[var(--muted)]"
+                        live.has(c.slug)
+                          ? "text-[var(--text)]"
+                          : "text-[var(--muted)]"
                       }`}
                     >
                       {c.name}
                     </h3>
                     <p className="mt-0.5 text-xs text-[var(--muted)]">
-                      {c.live ? "Available now" : "Coming soon"}
+                      {live.has(c.slug) ? "Available now" : "Coming soon"}
                     </p>
                   </div>
-                  {c.live && (
+                  {live.has(c.slug) && (
                     <Link
                       href={href}
                       aria-label={`View all ${c.name}`}
@@ -87,7 +93,7 @@ export default function CategoryShowcase() {
                 <ul className="grid flex-1 grid-cols-2 gap-2">
                   {c.items?.map((it) => (
                     <li key={it.name}>
-                      {c.live ? (
+                      {live.has(c.slug) ? (
                         <Link
                           href={href}
                           className={`${tile} h-full text-[var(--text)] transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--hover)] ${focus}`}

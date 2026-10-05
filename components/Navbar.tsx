@@ -14,6 +14,7 @@ import {
 import { categoryMeta, navSlugs } from "@/lib/categoryMeta";
 import { useCart } from "@/components/CartProvider";
 import { useFavourites } from "@/components/FavouritesProvider";
+import { useLiveCategories } from "@/components/LiveCategoriesProvider";
 
 const navCategories = navSlugs
   .map((s) => categoryMeta.find((c) => c.slug === s))
@@ -171,11 +172,13 @@ function CategoryList({
   onNavigate: () => void;
   columns: string;
 }) {
+  const live = useLiveCategories();
+
   return (
     <ul className={`grid gap-1 ${columns}`}>
       {categoryMeta.map((c) => (
         <li key={c.slug}>
-          {c.live ? (
+          {live.has(c.slug) ? (
             <Link
               href={`/products/${c.slug}`}
               onClick={onNavigate}
@@ -202,6 +205,8 @@ function CategoryList({
 }
 
 function CategoryScroller() {
+  const live = useLiveCategories();
+
   const ref = useRef<HTMLUListElement>(null);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
@@ -266,7 +271,7 @@ function CategoryScroller() {
       >
         {navCategories.map((c) => (
           <li key={c.slug} className="shrink-0">
-            {c.live ? (
+            {live.has(c.slug) ? (
               <Link
                 href={`/products/${c.slug}`}
                 className={`flex items-center rounded-full px-3 py-1.5 text-sm text-[var(--text)] transition-colors hover:bg-[var(--hover)] ${focus}`}

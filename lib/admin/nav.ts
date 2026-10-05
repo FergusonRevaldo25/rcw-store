@@ -1,4 +1,4 @@
-﻿import type { PermissionKey } from "@/lib/rbac/permissions";
+import type { PermissionKey } from "@/lib/rbac/permissions";
 
 export type NavItem = {
   label: string;
