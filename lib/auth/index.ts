@@ -8,6 +8,11 @@ import { db } from "../db";
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg" }),
   emailAndPassword: { enabled: true },
+  session: {
+    // Signed in for 7 days, and the clock renews once a day while in use.
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
+  },
   user: {
     additionalFields: {
       // "customer" | "seller" | "staff"

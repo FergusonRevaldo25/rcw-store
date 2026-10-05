@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+﻿import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { db } from "@/lib/db";
@@ -17,7 +17,7 @@ async function loadPermissions(userId: string) {
 // Server-only. Staff accounts with two-factor on, plus their permissions.
 export async function getStaff() {
   const session = await getSession();
-  if (!session) redirect("/sign-in");
+  if (!session) redirect("/admin/login");
   const user = session.user as typeof session.user & {
     kind?: string;
     status?: string;

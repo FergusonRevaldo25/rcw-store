@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { and, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -19,6 +19,7 @@ import {
   products,
   stockMovements,
 } from "@/lib/db/schema";
+import { requireFresh } from "@/lib/auth/fresh";
 import { requirePermission } from "@/lib/rbac/guard";
 import { validateProduct } from "@/lib/validation/product";
 
@@ -279,6 +280,7 @@ export async function publishOwn(fd: FormData): Promise<void> {
   const id = String(fd.get("productId") ?? "");
   if (!id) redirect("/admin/products?notice=missing");
   if (!(await isSuperAdmin(staff.user.id))) redirect("/admin/products?notice=notsuper");
+  await requireFresh(`/admin/products/${id}`);
 
   const outcome = await db.transaction(async (tx): Promise<string> => {
     const [p] = await tx

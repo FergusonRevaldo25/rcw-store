@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import TwoFactorSetup from "@/components/TwoFactorSetup";
 import { getSession } from "@/lib/auth/session";
@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Two-factor setup | RCW Store" };
 
 export default async function AdminTwoFactorPage() {
   const session = await getSession();
-  if (!session) redirect("/sign-in");
+  if (!session) redirect("/admin/login");
 
   const user = session.user as typeof session.user & {
     kind?: string;
