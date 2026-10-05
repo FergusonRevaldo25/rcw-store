@@ -101,6 +101,7 @@ export const STARTER_ROLES: RoleDef[] = [
     permissions: [
       ...mod("dashboard"),
       ...mod("marketing"),
+      ...mod("products", ["view", "create"]),
       ...mod("content", ["view"]),
       ...mod("reviews", ["view"]),
       ...mod("reports", ["view"]),

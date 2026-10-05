@@ -30,15 +30,6 @@ export default async function Home() {
         <HeroCarousel />
         <TrustStrip />
         <FeaturedBrands />
-        <AdBanner />
-        <ShopByBudget products={catalogue} />
-        <HexCollage products={catalogue} />
-        <CategoryShowcase />
-        <RandStretcher products={catalogue} />
-        <VibeQuiz products={catalogue} />
-        <MakerSpotlight />
-        <GrowWithUs />
-
         {featured.length > 0 && (
           <section>
             <Reveal>
@@ -55,6 +46,14 @@ export default async function Home() {
             </div>
           </section>
         )}
+        <AdBanner />
+        <ShopByBudget products={catalogue} />
+        <HexCollage products={catalogue} />
+        <CategoryShowcase />
+        <RandStretcher products={catalogue} />
+        <VibeQuiz products={catalogue} />
+        <MakerSpotlight />
+        <GrowWithUs />
 
         <RecentlyViewed />
 

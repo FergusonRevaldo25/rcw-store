@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductCard from "@/components/ProductCard";
+import { getLiveCategorySlugs } from "@/lib/catalogue/categories";
 import { searchProducts } from "@/lib/catalogue/storefront";
 import { categoryMeta } from "@/lib/categoryMeta";
 
@@ -28,7 +29,8 @@ export async function generateMetadata({
 export default async function SearchPage({ searchParams }: Props) {
   const q = readQuery((await searchParams).q);
   const results = q ? await searchProducts(q) : [];
-  const liveCategories = categoryMeta.filter((c) => c.live);
+  const liveSlugs = await getLiveCategorySlugs();
+  const liveCategories = categoryMeta.filter((c) => liveSlugs.has(c.slug));
 
   return (
     <main className="min-h-screen">

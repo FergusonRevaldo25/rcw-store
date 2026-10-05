@@ -4,6 +4,7 @@ import { and, eq, inArray, ne, sql, sum } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auditValues, type Tx } from "@/lib/audit/log";
+import { requireFresh } from "@/lib/auth/fresh";
 import { db } from "@/lib/db";
 import {
   auditLog,
@@ -95,6 +96,7 @@ export async function requestRefund(fd: FormData): Promise<void> {
 // Step 2: a different person approves or rejects.
 export async function decideRefund(fd: FormData): Promise<void> {
   const staff = await requirePermission("returns:approve");
+  await requireFresh("/admin/returns?status=requested");
   const id = String(fd.get("refundId") ?? "");
   const decision = String(fd.get("decision") ?? "");
   const note = String(fd.get("note") ?? "").trim().slice(0, 300);

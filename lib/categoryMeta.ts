@@ -49,7 +49,7 @@ export const categoryMeta: CategoryMeta[] = [
     items: [
       { name: "Cookware" },
       { name: "Storage" },
-      { name: "Décor" },
+      { name: "D\u00e9cor" },
       { name: "Bedding" },
     ],
   },

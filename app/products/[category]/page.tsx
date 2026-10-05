@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductListing from "@/components/ProductListing";
+import { getLiveCategorySlugs } from "@/lib/catalogue/categories";
 import { listProducts } from "@/lib/catalogue/storefront";
 import { categoryMeta } from "@/lib/categoryMeta";
 
@@ -18,9 +19,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const meta = categoryMeta.find((c) => c.slug === category);
   if (!meta) return { title: "Category not found | RCW Store" };
 
+  const live = (await getLiveCategorySlugs()).has(meta.slug);
   return {
     title: `${meta.name} | RCW Store`,
-    description: meta.live
+    description: live
       ? `Shop ${meta.name} at RCW Store. Great deals and cheap prices, proudly South African.`
       : `${meta.name} is coming soon to RCW Store.`,
   };
@@ -31,10 +33,13 @@ export default async function CategoryPage({ params }: Props) {
   const meta = categoryMeta.find((c) => c.slug === category);
   if (!meta) notFound();
 
-  const items = meta.live
+  // The database decides what is live, so switching a category on there is enough.
+  const liveSlugs = await getLiveCategorySlugs();
+  const live = liveSlugs.has(meta.slug);
+  const items = live
     ? await listProducts({ categorySlug: meta.slug, limit: 100 })
     : [];
-  const liveCategories = categoryMeta.filter((c) => c.live);
+  const liveCategories = categoryMeta.filter((c) => liveSlugs.has(c.slug));
 
   return (
     <main className="min-h-screen">
@@ -47,7 +52,7 @@ export default async function CategoryPage({ params }: Props) {
           {meta.name}
         </h1>
 
-        {!meta.live ? (
+        {!live ? (
           <section className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
             <h2 className="text-lg font-semibold text-[var(--text)]">
               Coming soon

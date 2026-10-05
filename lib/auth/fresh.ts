@@ -6,8 +6,14 @@ import { getStaff } from "@/lib/rbac/guard";
 const COOKIE = "rcw_fresh";
 const MINUTES = 10;
 
+function secret(): string {
+  const s = process.env.BETTER_AUTH_SECRET;
+  if (!s) throw new Error("BETTER_AUTH_SECRET is not set");
+  return s;
+}
+
 const sign = (v: string) =>
-  createHmac("sha256", process.env.BETTER_AUTH_SECRET ?? "").update(v).digest("hex");
+  createHmac("sha256", secret()).update(v).digest("hex");
 
 export async function markFresh(userId: string) {
   const v = `${userId}.${Date.now() + MINUTES * 60_000}`;

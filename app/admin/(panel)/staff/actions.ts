@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auditValues } from "@/lib/audit/log";
+import { requireFresh } from "@/lib/auth/fresh";
 import { db } from "@/lib/db";
 import {
   auditLog,
@@ -30,8 +31,12 @@ function end(path: string, notice: string): never {
   redirect(`${path}?notice=${notice}`);
 }
 
-async function begin(p: PermissionKey) {
+// Every staff action is sensitive, so each one needs a fresh authenticator
+// code (valid for 10 minutes). "next" is the page to come back to after
+// confirming, where the person presses the button again.
+async function begin(p: PermissionKey, next: string) {
   const staff = await requirePermission(p);
+  await requireFresh(next);
   return { staff, isSuper: await isSuperAdmin(staff.user.id) };
 }
 
@@ -57,7 +62,7 @@ async function guardRole(staff: Staff, isSuper: boolean, roleId: string, path: s
 }
 
 export async function addStaff(fd: FormData) {
-  const { staff, isSuper } = await begin("staff:create");
+  const { staff, isSuper } = await begin("staff:create", "/admin/staff/invite");
   const email = String(fd.get("email") ?? "").trim().toLowerCase();
   const roleId = String(fd.get("roleId") ?? "");
   if (fd.get("confirm") !== "on" || !email || !roleId) end("/admin/staff", "invalid");
@@ -82,10 +87,10 @@ export async function addStaff(fd: FormData) {
 }
 
 export async function assignRole(fd: FormData) {
-  const { staff, isSuper } = await begin("staff:edit");
   const id = String(fd.get("userId") ?? "");
   const roleId = String(fd.get("roleId") ?? "");
   const path = `/admin/staff/${id}`;
+  const { staff, isSuper } = await begin("staff:edit", path);
   await guardTarget(staff, isSuper, id, path);
   const role = await guardRole(staff, isSuper, roleId, path);
 
@@ -100,10 +105,10 @@ export async function assignRole(fd: FormData) {
 }
 
 export async function removeRole(fd: FormData) {
-  const { staff, isSuper } = await begin("staff:edit");
   const id = String(fd.get("userId") ?? "");
   const roleId = String(fd.get("roleId") ?? "");
   const path = `/admin/staff/${id}`;
+  const { staff, isSuper } = await begin("staff:edit", path);
   await guardTarget(staff, isSuper, id, path);
   const role = await guardRole(staff, isSuper, roleId, path);
   if (role.key === "super_admin" && (await otherActiveSuperAdmins(id)) === 0) end(path, "lastsuper");
@@ -116,10 +121,10 @@ export async function removeRole(fd: FormData) {
 }
 
 export async function setStatus(fd: FormData) {
-  const { staff, isSuper } = await begin("staff:edit");
   const id = String(fd.get("userId") ?? "");
   const status = String(fd.get("status") ?? "");
   const path = `/admin/staff/${id}`;
+  const { staff, isSuper } = await begin("staff:edit", path);
   if (status !== "active" && status !== "suspended") end(path, "invalid");
   await guardTarget(staff, isSuper, id, path);
   if (
@@ -139,9 +144,9 @@ export async function setStatus(fd: FormData) {
 }
 
 export async function removeStaff(fd: FormData) {
-  const { staff, isSuper } = await begin("staff:delete");
   const id = String(fd.get("userId") ?? "");
   const path = `/admin/staff/${id}`;
+  const { staff, isSuper } = await begin("staff:delete", path);
   await guardTarget(staff, isSuper, id, path);
   if ((await roleKeysOf(id)).includes("super_admin") && (await otherActiveSuperAdmins(id)) === 0) {
     end(path, "lastsuper");
@@ -158,10 +163,10 @@ export async function removeStaff(fd: FormData) {
 }
 
 export async function grantCategory(fd: FormData) {
-  const { staff, isSuper } = await begin("staff:edit");
   const id = String(fd.get("userId") ?? "");
   const categoryId = String(fd.get("categoryId") ?? "");
   const path = `/admin/staff/${id}`;
+  const { staff, isSuper } = await begin("staff:edit", path);
   await guardTarget(staff, isSuper, id, path);
   if (!categoryId) end(path, "invalid");
 
@@ -176,10 +181,10 @@ export async function grantCategory(fd: FormData) {
 }
 
 export async function revokeCategory(fd: FormData) {
-  const { staff, isSuper } = await begin("staff:edit");
   const id = String(fd.get("userId") ?? "");
   const categoryId = String(fd.get("categoryId") ?? "");
   const path = `/admin/staff/${id}`;
+  const { staff, isSuper } = await begin("staff:edit", path);
   await guardTarget(staff, isSuper, id, path);
 
   await db.transaction(async (tx) => {
