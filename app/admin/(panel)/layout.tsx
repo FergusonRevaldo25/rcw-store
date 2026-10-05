@@ -6,10 +6,12 @@ import { getStaff } from "@/lib/rbac/guard";
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const { user, permissions } = await getStaff();
 
-  // Each person only sees the sections their role allows.
+  // Each person only sees built pages their role allows.
   const groups = ADMIN_NAV.map((g) => ({
     ...g,
-    items: g.items.filter((i) => i.href === "/admin" || permissions.has(i.permission)),
+    items: g.items.filter(
+      (i) => i.built && (i.href === "/admin" || permissions.has(i.permission))
+    ),
   })).filter((g) => g.items.length > 0);
 
   return (

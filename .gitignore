@@ -42,3 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 scripts/share-dump.txt
+
+scripts/*.backup.txt
+scripts/share-dump.txt

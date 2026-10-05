@@ -1,10 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import InstallButton from "@/components/admin/InstallButton";
-import Sidebar from "@/components/admin/Sidebar";
 import ThemeToggle from "@/components/ThemeToggle";
 import { authClient } from "@/lib/auth/client";
 import type { NavGroup } from "@/lib/admin/nav";
@@ -22,14 +22,20 @@ export default function AdminShell({
   children: ReactNode;
 }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
+  // The longest matching path wins, so /admin/pos/sales does not also
+  // light up /admin/pos.
+  const best = groups
+    .flatMap((g) => g.items.map((i) => ({ href: i.href, group: g.title })))
+    .filter((i) =>
+      i.href === "/admin"
+        ? pathname === "/admin"
+        : pathname === i.href || pathname.startsWith(i.href + "/")
+    )
+    .sort((a, b) => b.href.length - a.href.length)[0];
+
+  const activeGroup = groups.find((g) => g.title === best?.group);
 
   async function signOut() {
     await authClient.signOut({
@@ -44,40 +50,15 @@ export default function AdminShell({
 
   return (
     <div className="min-h-screen bg-[var(--bg)]">
-      {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-[var(--border)] bg-[var(--menu)] lg:block">
-        <Sidebar groups={groups} />
-      </aside>
+      <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--header)] backdrop-blur">
+        {/* Row 1: brand and account */}
+        <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-3 px-4 sm:px-6">
+          <Link href="/admin" className={`flex items-center gap-3 rounded-lg ${focus}`}>
+            <Image src="/logo.png" alt="" width={32} height={32} className="h-8 w-8 rounded-full" />
+            <span className="text-base font-bold rcw-gradient-text">RCW Staff</span>
+          </Link>
 
-      {/* Mobile drawer */}
-      {open && (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="absolute inset-0 bg-black/60" aria-hidden="true" onClick={() => setOpen(false)} />
-          <aside
-            role="dialog"
-            aria-modal="true"
-            aria-label="Admin menu"
-            className="absolute inset-y-0 left-0 w-72 max-w-[85%] border-r border-[var(--border)] bg-[var(--menu)]"
-          >
-            <Sidebar groups={groups} onNavigate={() => setOpen(false)} />
-          </aside>
-        </div>
-      )}
-
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--header)] px-4 backdrop-blur sm:px-6">
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            aria-label="Open menu"
-            className={`grid h-10 w-10 place-items-center rounded-lg border border-[var(--border)] text-[var(--text)] lg:hidden ${focus}`}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-
-          <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <InstallButton />
             <Link
               href="/"
@@ -95,10 +76,60 @@ export default function AdminShell({
               Sign out
             </button>
           </div>
-        </header>
+        </div>
 
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</div>
-      </div>
+        {/* Row 2: main areas */}
+        <nav aria-label="Admin areas" className="border-t border-[var(--border)]">
+          <ul className="mx-auto flex max-w-screen-2xl gap-1 overflow-x-auto px-4 sm:px-6">
+            {groups.map((g) => {
+              const isActive = g.title === activeGroup?.title;
+              return (
+                <li key={g.title} className="shrink-0">
+                  <Link
+                    href={g.items[0].href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`relative inline-flex min-h-11 items-center px-3 text-sm font-medium whitespace-nowrap transition-colors ${focus} ${
+                      isActive
+                        ? "text-[var(--text)] after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-gradient-to-r after:from-violet-600 after:via-fuchsia-500 after:to-orange-500"
+                        : "text-[var(--muted)] hover:text-[var(--text)]"
+                    }`}
+                  >
+                    {g.title}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* Row 3: pages inside the active area (hidden when there is only one) */}
+        {activeGroup && activeGroup.items.length > 1 && (
+          <nav aria-label={`${activeGroup.title} pages`} className="border-t border-[var(--border)] bg-[var(--surface)]">
+            <ul className="mx-auto flex max-w-screen-2xl gap-2 overflow-x-auto px-4 py-2 sm:px-6">
+              {activeGroup.items.map((i) => {
+                const isActive = i.href === best?.href;
+                return (
+                  <li key={i.href} className="shrink-0">
+                    <Link
+                      href={i.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`inline-flex min-h-10 items-center rounded-lg px-4 text-sm whitespace-nowrap transition-colors ${focus} ${
+                        isActive
+                          ? "bg-[var(--hover)] font-semibold text-[var(--text)] ring-1 ring-fuchsia-500/40"
+                          : "text-[var(--muted)] hover:bg-[var(--hover)] hover:text-[var(--text)]"
+                      }`}
+                    >
+                      {i.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        )}
+      </header>
+
+      <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 sm:py-8">{children}</div>
     </div>
   );
 }
