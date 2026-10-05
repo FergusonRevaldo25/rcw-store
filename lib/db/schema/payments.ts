@@ -8,7 +8,7 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { orders } from "./orders";
+import { orders, posSessions } from "./orders";
 import { user } from "./users";
 
 export const PAYMENT_METHODS = [
@@ -97,10 +97,16 @@ export const refunds = pgTable(
       .notNull()
       .defaultNow(),
     decidedAt: timestamp("decided_at", { withTimezone: true }),
+    // The till that handed out or reversed the money. Set when status becomes "paid".
+    posSessionId: text("pos_session_id").references(() => posSessions.id, {
+      onDelete: "restrict",
+    }),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
   },
   (t) => [
     index("refunds_order_idx").on(t.orderId),
     index("refunds_status_idx").on(t.status),
+    index("refunds_session_idx").on(t.posSessionId),
     check("refunds_amount_positive", sql`${t.amountCents} > 0`),
     // Maker-checker: the person who requests a refund cannot decide it.
     check(

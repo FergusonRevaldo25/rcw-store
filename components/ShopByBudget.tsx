@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/lib/products";
+import type { Product } from "@/types/product";
 
 const tiers = [150, 300, 600];
 
-export default function ShopByBudget() {
+export default function ShopByBudget({ products }: { products: Product[] }) {
   const [max, setMax] = useState<number | null>(null);
   const results = max ? products.filter((p) => p.price <= max) : [];
 

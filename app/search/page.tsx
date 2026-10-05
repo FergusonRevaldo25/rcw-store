@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductCard from "@/components/ProductCard";
+import { searchProducts } from "@/lib/catalogue/storefront";
 import { categoryMeta } from "@/lib/categoryMeta";
-import { products } from "@/lib/products";
 
 type Props = { searchParams: Promise<{ q?: string | string[] }> };
 
@@ -27,20 +27,7 @@ export async function generateMetadata({
 
 export default async function SearchPage({ searchParams }: Props) {
   const q = readQuery((await searchParams).q);
-  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-
-  const categoryName = (slug: string) =>
-    categoryMeta.find((c) => c.slug === slug)?.name ?? slug;
-
-  // Every word must appear in the name, description or category name.
-  const results = words.length
-    ? products.filter((p) => {
-        const haystack =
-          `${p.name} ${p.description} ${categoryName(p.category)}`.toLowerCase();
-        return words.every((w) => haystack.includes(w));
-      })
-    : [];
-
+  const results = q ? await searchProducts(q) : [];
   const liveCategories = categoryMeta.filter((c) => c.live);
 
   return (

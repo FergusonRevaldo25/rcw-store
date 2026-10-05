@@ -26,10 +26,11 @@ export const ADMIN_NAV: NavGroup[] = [
   {
     title: "Sales",
     items: [
-      { label: "Point of sale", href: "/admin/pos", permission: "pos:view", built: false },
+      { label: "Point of sale", href: "/admin/pos", permission: "pos:view", built: true },
+      { label: "POS sales", href: "/admin/pos/sales", permission: "pos:view", built: true },
       { label: "Sales", href: "/admin/sales", permission: "sales:view", built: false },
       { label: "Orders", href: "/admin/orders", permission: "orders:view", built: false },
-      { label: "Returns", href: "/admin/returns", permission: "returns:view", built: false },
+      { label: "Returns and refunds", href: "/admin/returns", permission: "returns:view", built: true },
       { label: "Shipping", href: "/admin/shipping", permission: "shipping:view", built: false },
       { label: "Customers", href: "/admin/customers", permission: "customers:view", built: false },
     ],

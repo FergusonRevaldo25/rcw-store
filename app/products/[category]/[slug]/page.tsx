@@ -7,22 +7,16 @@ import ProductActions from "@/components/ProductActions";
 import ProductCard from "@/components/ProductCard";
 import ProductReviews from "@/components/ProductReviews";
 import RecentlyViewedTracker from "@/components/RecentlyViewedTracker";
+import { getProductBySlug, listProducts } from "@/lib/catalogue/storefront";
 import { categoryMeta } from "@/lib/categoryMeta";
-import {
-  getProductBySlug,
-  getProductsByCategory,
-  products,
-} from "@/lib/products";
 
 type Props = { params: Promise<{ category: string; slug: string }> };
 
-export function generateStaticParams() {
-  return products.map((p) => ({ category: p.category, slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product || product.category !== category) {
     return { title: "Product not found | RCW Store" };
   }
@@ -36,18 +30,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProductPage({ params }: Props) {
   const { category, slug } = await params;
 
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product || product.category !== category) notFound();
 
   const meta = categoryMeta.find((c) => c.slug === product.category);
   const categoryName = meta?.name ?? product.category;
 
-  const related = getProductsByCategory(product.category).filter(
-    (p) => p.slug !== product.slug,
-  );
-
-  // Digital products are bought once, so no quantity picker for them.
-  const showQuantity = product.category !== "digital-products";
+  const related = await listProducts({
+    categorySlug: product.category,
+    excludeSlug: product.slug,
+    limit: 4,
+  });
 
   return (
     <main className="min-h-screen">
@@ -94,7 +87,20 @@ export default async function ProductPage({ params }: Props) {
             </p>
 
             <div className="mt-6">
-              <ProductActions product={product} showQuantity={showQuantity} />
+              {product.inStock ? (
+                // Digital products are bought once, so no quantity picker.
+                <ProductActions
+                  product={product}
+                  showQuantity={!product.isDigital}
+                />
+              ) : (
+                <p
+                  role="status"
+                  className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 text-sm text-[var(--muted)]"
+                >
+                  This product is sold out right now. Please check back soon.
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/lib/products";
+import type { Product } from "@/types/product";
 
 type Answers = Record<string, string | number>;
 
@@ -37,7 +37,7 @@ const steps = [
   },
 ];
 
-function pick(a: Answers) {
+function pick(a: Answers, products: Product[]) {
   const budget = Number(a.budget ?? 99999);
   const score = (cat: string) =>
     (a.want !== "any" && cat === a.want ? 3 : 0) +
@@ -56,11 +56,11 @@ function pick(a: Answers) {
   return { list, exact };
 }
 
-export default function VibeQuiz() {
+export default function VibeQuiz({ products }: { products: Product[] }) {
   const [step, setStep] = useState(0);
   const [a, setA] = useState<Answers>({});
   const done = step >= steps.length;
-  const result = done ? pick(a) : null;
+  const result = done ? pick(a, products) : null;
 
   return (
     <section aria-labelledby="quiz-heading">
@@ -134,16 +134,24 @@ export default function VibeQuiz() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <h3 className="text-lg font-semibold text-[var(--text)]">
-                  {result!.exact
-                    ? "Your picks"
-                    : "Closest matches for your budget"}
-                </h3>
-                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  {result!.list.map((p) => (
-                    <ProductCard key={p.slug} product={p} />
-                  ))}
-                </div>
+                {result!.list.length === 0 ? (
+                  <p className="text-sm text-[var(--muted)]">
+                    We have no products to suggest yet. Please check back soon.
+                  </p>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-semibold text-[var(--text)]">
+                      {result!.exact
+                        ? "Your picks"
+                        : "Closest matches for your budget"}
+                    </h3>
+                    <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                      {result!.list.map((p) => (
+                        <ProductCard key={p.slug} product={p} />
+                      ))}
+                    </div>
+                  </>
+                )}
                 <button
                   type="button"
                   onClick={() => {

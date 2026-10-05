@@ -102,3 +102,19 @@ body {
     scrollbar-color: var(--border-strong) var(--bg);
   }
 }
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receipt,
+  #receipt * {
+    visibility: visible;
+  }
+  #receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    box-shadow: none;
+  }
+}

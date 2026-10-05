@@ -3,31 +3,34 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
-import { products } from "@/lib/products";
+import { formatRand } from "@/lib/format";
 import type { Product } from "@/types/product";
 
 // Tries every combination, so it only looks at the first 16 products.
 // When your catalogue grows, switch to a simpler greedy approach.
-function stretch(budget: number, pool: Product[]) {
-  const list = pool.slice(0, 16);
-  let top: Product[] = [];
+// Works in cents so totals never pick up rounding errors.
+function stretch(budgetCents: number, pool: Product[]) {
+  const list = pool
+    .slice(0, 16)
+    .map((p) => ({ p, cents: Math.round(p.price * 100) }));
+  let top: typeof list = [];
   let topSum = 0;
   for (let m = 1; m < 1 << list.length; m++) {
     let sum = 0;
     let count = 0;
     for (let i = 0; i < list.length; i++) {
       if (m & (1 << i)) {
-        sum += list[i].price;
+        sum += list[i].cents;
         count++;
       }
     }
-    if (sum > budget) continue;
+    if (sum > budgetCents) continue;
     if (count > top.length || (count === top.length && sum > topSum)) {
       top = list.filter((_, i) => m & (1 << i));
       topSum = sum;
     }
   }
-  return { items: top, total: topSum };
+  return { items: top.map((t) => t.p), totalCents: topSum };
 }
 
 const filters = [
@@ -40,7 +43,7 @@ const presets = [300, 500, 1000];
 const chip =
   "rounded-full border px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-500/70";
 
-export default function RandStretcher() {
+export default function RandStretcher({ products }: { products: Product[] }) {
   const [raw, setRaw] = useState("500");
   const [cat, setCat] = useState("all");
   const budget = Math.max(0, Math.floor(Number(raw) || 0));
@@ -48,8 +51,10 @@ export default function RandStretcher() {
   const result = useMemo(() => {
     const pool =
       cat === "all" ? products : products.filter((p) => p.category === cat);
-    return stretch(budget, pool);
-  }, [budget, cat]);
+    return stretch(budget * 100, pool);
+  }, [budget, cat, products]);
+
+  const total = result.totalCents / 100;
 
   return (
     <section aria-labelledby="stretch-heading">
@@ -136,7 +141,7 @@ export default function RandStretcher() {
                       className="flex items-center justify-between gap-3 px-4 py-3 text-sm text-[var(--text)] hover:bg-[var(--hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-500/70"
                     >
                       <span>{p.name}</span>
-                      <span className="font-semibold">R{p.price}</span>
+                      <span className="font-semibold">{formatRand(p.price)}</span>
                     </Link>
                   </motion.li>
                 ))}
@@ -144,8 +149,8 @@ export default function RandStretcher() {
               <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
                 {[
                   ["Items", String(result.items.length)],
-                  ["Total", `R${result.total}`],
-                  ["Left over", `R${budget - result.total}`],
+                  ["Total", formatRand(total)],
+                  ["Left over", formatRand(budget - total)],
                 ].map(([k, v]) => (
                   <div key={k} className="rounded-xl bg-[var(--hover)] py-3">
                     <dt className="text-xs uppercase tracking-widest text-[var(--muted)]">

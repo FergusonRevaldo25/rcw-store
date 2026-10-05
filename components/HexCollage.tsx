@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
-import { products } from "@/lib/products";
+import { formatRand } from "@/lib/format";
+import type { Product } from "@/types/product";
 
 const HEX = "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)";
 
@@ -65,7 +66,7 @@ const slots: Slot[] = [
   },
 ];
 
-export default function HexCollage() {
+export default function HexCollage({ products }: { products: Product[] }) {
   const reduce = useReducedMotion();
 
   return (
@@ -93,6 +94,7 @@ export default function HexCollage() {
         {slots.map((s, i) => {
           const p = s.product !== undefined ? products[s.product] : undefined;
           const href = p ? `/products/${p.category}/${p.slug}` : s.href;
+          // A photo tile with no product to show is skipped.
           if (!href || (s.product !== undefined && !p)) return null;
           const name = p?.name ?? s.label ?? "";
 
@@ -141,7 +143,7 @@ export default function HexCollage() {
                       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 pb-[10%] pt-6 text-center text-[8px] font-semibold text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:text-xs">
                         {p.name}
                         <span className="block font-normal text-white/80">
-                          R{p.price}
+                          {formatRand(p.price)}
                         </span>
                       </div>
                     </>

@@ -3,17 +3,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductListing from "@/components/ProductListing";
+import { listProducts } from "@/lib/catalogue/storefront";
 import { categoryMeta } from "@/lib/categoryMeta";
-import { getProductsByCategory } from "@/lib/products";
 
 type Props = { params: Promise<{ category: string }> };
 
+export const dynamic = "force-dynamic";
+
 const focus =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-500/70";
-
-export function generateStaticParams() {
-  return categoryMeta.map((c) => ({ category: c.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
@@ -33,7 +31,9 @@ export default async function CategoryPage({ params }: Props) {
   const meta = categoryMeta.find((c) => c.slug === category);
   if (!meta) notFound();
 
-  const items = meta.live ? getProductsByCategory(meta.slug) : [];
+  const items = meta.live
+    ? await listProducts({ categorySlug: meta.slug, limit: 100 })
+    : [];
   const liveCategories = categoryMeta.filter((c) => c.live);
 
   return (

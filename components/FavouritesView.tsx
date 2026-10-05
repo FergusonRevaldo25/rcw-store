@@ -1,18 +1,43 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import AnimatedCard from "@/components/AnimatedCard";
 import ProductCard from "@/components/ProductCard";
 import { useFavourites } from "@/components/FavouritesProvider";
-import { products } from "@/lib/products";
+import { fetchProductsBySlugs } from "@/lib/catalogue/storefront-actions";
+import type { StoreProduct } from "@/lib/catalogue/storefront";
 
 const focus =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-500/70";
 
 export default function FavouritesView() {
   const { slugs, hydrated } = useFavourites();
+  const [fetched, setFetched] = useState<StoreProduct[] | null>(null);
 
-  if (!hydrated) {
+  // A stable key, so the list is only fetched again when the saved slugs change.
+  const key = slugs.join("|");
+
+  useEffect(() => {
+    if (!hydrated || !key) return;
+    let cancelled = false;
+
+    fetchProductsBySlugs(key.split("|"))
+      .then((list) => {
+        if (!cancelled) setFetched(list);
+      })
+      .catch(() => {
+        if (!cancelled) setFetched([]);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, key]);
+
+  const loading = !hydrated || (slugs.length > 0 && fetched === null);
+
+  if (loading) {
     return (
       <div
         aria-busy="true"
@@ -22,8 +47,9 @@ export default function FavouritesView() {
     );
   }
 
-  // Ignore saved slugs for products that no longer exist.
-  const saved = products.filter((p) => slugs.includes(p.slug));
+  // Ignore saved slugs for products that no longer exist or are sold out,
+  // and drop a product the moment its heart is switched off.
+  const saved = (fetched ?? []).filter((p) => slugs.includes(p.slug));
 
   if (saved.length === 0) {
     return (

@@ -14,9 +14,16 @@ import MakerSpotlight from "@/components/MakerSpotlight";
 import GrowWithUs from "@/components/GrowWithUs";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import DeliveryChecker from "@/components/DeliveryChecker";
-import { products } from "@/lib/products";
+import { listProducts } from "@/lib/catalogue/storefront";
 
-export default function Home() {
+// Always fresh, so a POS sale shows on the site straight away.
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  // One query feeds the featured row and the interactive widgets.
+  const catalogue = await listProducts({ limit: 24 });
+  const featured = catalogue.slice(0, 8);
+
   return (
     <main className="min-h-screen">
       <div className="mx-auto max-w-6xl space-y-10 p-6">
@@ -24,28 +31,30 @@ export default function Home() {
         <TrustStrip />
         <FeaturedBrands />
         <AdBanner />
-        <ShopByBudget />
-        <HexCollage />
+        <ShopByBudget products={catalogue} />
+        <HexCollage products={catalogue} />
         <CategoryShowcase />
-        <RandStretcher />
-        <VibeQuiz />
+        <RandStretcher products={catalogue} />
+        <VibeQuiz products={catalogue} />
         <MakerSpotlight />
         <GrowWithUs />
 
-        <section>
-          <Reveal>
-            <h2 className="mb-4 text-xl font-bold text-[var(--text)]">
-              Featured Products
-            </h2>
-          </Reveal>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {products.map((p, i) => (
-              <AnimatedCard key={p.slug} index={i}>
-                <ProductCard product={p} />
-              </AnimatedCard>
-            ))}
-          </div>
-        </section>
+        {featured.length > 0 && (
+          <section>
+            <Reveal>
+              <h2 className="mb-4 text-xl font-bold text-[var(--text)]">
+                Featured Products
+              </h2>
+            </Reveal>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {featured.map((p, i) => (
+                <AnimatedCard key={p.slug} index={i}>
+                  <ProductCard product={p} />
+                </AnimatedCard>
+              ))}
+            </div>
+          </section>
+        )}
 
         <RecentlyViewed />
 
