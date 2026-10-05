@@ -3,3 +3,6 @@ export * from "./roles";
 export * from "./audit";
 export * from "./sellers";
 export * from "./catalogue";
+export * from "./orders";
+export * from "./payments";
+export * from "./inventory";
