@@ -4,11 +4,11 @@ export type NavItem = {
   label: string;
   href: string;
   permission: PermissionKey;
-  built: boolean; // false shows a "Soon" tag and no link
+  built: boolean; // false hides the tab and blocks the sample page
 };
 export type NavGroup = { title: string; items: NavItem[] };
 
-// Flip `built` to true as each section gets real pages.
+// Only flip `built` to true when the page shows REAL data.
 export const ADMIN_NAV: NavGroup[] = [
   {
     title: "Overview",
@@ -18,7 +18,7 @@ export const ADMIN_NAV: NavGroup[] = [
     title: "Catalogue",
     items: [
       { label: "Products", href: "/admin/products", permission: "products:view", built: true },
-      { label: "Categories", href: "/admin/categories", permission: "categories:view", built: true },
+      { label: "Categories", href: "/admin/categories", permission: "categories:view", built: false },
       { label: "Digital files", href: "/admin/digital-files", permission: "digital_files:view", built: false },
       { label: "Inventory", href: "/admin/inventory", permission: "inventory:view", built: true },
     ],
@@ -31,8 +31,8 @@ export const ADMIN_NAV: NavGroup[] = [
       { label: "Sales", href: "/admin/sales", permission: "sales:view", built: false },
       { label: "Orders", href: "/admin/orders", permission: "orders:view", built: true },
       { label: "Returns and refunds", href: "/admin/returns", permission: "returns:view", built: true },
-      { label: "Shipping", href: "/admin/shipping", permission: "shipping:view", built: true },
-      { label: "Customers", href: "/admin/customers", permission: "customers:view", built: true },
+      { label: "Shipping", href: "/admin/shipping", permission: "shipping:view", built: false },
+      { label: "Customers", href: "/admin/customers", permission: "customers:view", built: false },
     ],
   },
   {

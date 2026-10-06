@@ -1,5 +1,6 @@
-"use client";
+﻿"use client";
 
+import { formatRand } from "@/lib/format";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
@@ -103,7 +104,7 @@ export default function ProductActions({
 
             {qty > 1 && (
               <p className="text-sm text-[var(--muted)]">
-                Total: R{product.price * qty}
+                Total: {formatRand(product.price * qty)}
               </p>
             )}
           </div>
@@ -178,3 +179,4 @@ export default function ProductActions({
     </MotionConfig>
   );
 }
+

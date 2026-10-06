@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -45,7 +45,7 @@ export default function AdminShell({
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/");
+          router.push("/admin/login");
           router.refresh();
         },
       },
@@ -66,7 +66,7 @@ export default function AdminShell({
           <div className="flex items-center gap-2 sm:gap-3">
             <InstallButton />
             <Link
-              href="/"
+              href="/" target="_blank" rel="noopener noreferrer"
               className={`hidden rounded-lg px-3 py-2 text-sm text-[var(--muted)] hover:text-[var(--text)] sm:block ${focus}`}
             >
               View store

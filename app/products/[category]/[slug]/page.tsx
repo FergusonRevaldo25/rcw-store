@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -8,6 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import ProductReviews from "@/components/ProductReviews";
 import RecentlyViewedTracker from "@/components/RecentlyViewedTracker";
 import { getProductBySlug, listProducts } from "@/lib/catalogue/storefront";
+import { formatRand } from "@/lib/format";
 import { categoryMeta } from "@/lib/categoryMeta";
 
 type Props = { params: Promise<{ category: string; slug: string }> };
@@ -76,7 +77,7 @@ export default async function ProductPage({ params }: Props) {
             </h1>
 
             <p className="mt-4 text-3xl font-bold text-[var(--text)]">
-              R{product.price}
+              {formatRand(product.price)}
             </p>
             <div className="mt-1">
               <PayInParts price={product.price} />

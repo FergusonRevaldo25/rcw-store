@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -7,6 +7,7 @@ import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import PayInParts from "@/components/PayInParts";
 import { useCart } from "@/components/CartProvider";
 import { useFavourites } from "@/components/FavouritesProvider";
+import { formatRand } from "@/lib/format";
 import type { Product } from "@/types/product";
 
 const focus =
@@ -94,7 +95,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
           <div className="mt-3 flex items-center justify-between gap-2">
             <div>
-              <p className="font-bold text-[var(--text)]">R{product.price}</p>
+              <p className="font-bold text-[var(--text)]">{formatRand(product.price)}</p>
               <PayInParts price={product.price} />
             </div>
 
@@ -135,3 +136,4 @@ export default function ProductCard({ product }: { product: Product }) {
     </MotionConfig>
   );
 }
+

@@ -45,3 +45,5 @@ scripts/share-dump.txt
 
 scripts/*.backup.txt
 scripts/share-dump.txt
+
+.env.main.local

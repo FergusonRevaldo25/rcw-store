@@ -1,5 +1,6 @@
-"use client";
+﻿"use client";
 
+import { formatRand } from "@/lib/format";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -188,7 +189,7 @@ export default function CartDrawer() {
                               {item.name}
                             </Link>
                             <p className="shrink-0 text-sm font-bold text-[var(--text)]">
-                              R{item.price * item.qty}
+                              {formatRand(item.price * item.qty)}
                             </p>
                           </div>
 
@@ -278,7 +279,7 @@ export default function CartDrawer() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-[var(--muted)]">Subtotal</span>
                   <span className="text-lg font-bold text-[var(--text)]">
-                    R{subtotal}
+                    {formatRand(subtotal)}
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-[var(--muted)]">
@@ -312,3 +313,4 @@ export default function CartDrawer() {
     </MotionConfig>
   );
 }
+

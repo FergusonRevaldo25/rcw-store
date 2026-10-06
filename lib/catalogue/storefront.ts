@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, ilike, inArray, ne, or } from "drizzle-orm";
+﻿import { and, asc, eq, gt, ilike, inArray, ne, or } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/lib/db";
 import { categories, productImages, products } from "@/lib/db/schema";
@@ -42,7 +42,7 @@ type Row = Awaited<ReturnType<typeof baseQuery>>[number];
 
 // Only approved products in categories that are switched on.
 const visible = and(eq(products.status, "live"), eq(categories.live, true));
-const inStockCond = or(eq(products.trackStock, false), gt(products.stock, 0));
+const inStockCond = or(eq(products.isDigital, true), eq(products.trackStock, false), gt(products.stock, 0));
 
 async function hydrate(rows: Row[]): Promise<StoreProduct[]> {
   if (rows.length === 0) return [];
@@ -66,7 +66,7 @@ async function hydrate(rows: Row[]): Promise<StoreProduct[]> {
     description: r.description,
     image: first.get(r.id) ?? staticImage.get(r.slug) ?? FALLBACK_IMAGE,
     isDigital: r.isDigital,
-    inStock: !r.trackStock || r.stock > 0,
+    inStock: r.isDigital || !r.trackStock || r.stock > 0,
   }));
 }
 

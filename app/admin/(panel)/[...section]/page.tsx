@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import SamplePageView from "@/components/admin/SamplePageView";
 import { ADMIN_NAV } from "@/lib/admin/nav";
@@ -18,7 +18,7 @@ export default async function SectionPage({
 
   const item = ADMIN_NAV.flatMap((g) => g.items).find((i) => i.href === href);
   const page = SAMPLE_PAGES[href];
-  if (!item || !page) notFound();
+  if (!item || !item.built || !page) notFound();
 
   await requirePermission(item.permission);
   return <SamplePageView page={page} />;

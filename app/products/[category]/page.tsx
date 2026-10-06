@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductListing from "@/components/ProductListing";
-import { getLiveCategorySlugs } from "@/lib/catalogue/categories";
+import { getLiveSlugsForChrome } from "@/lib/catalogue/categories";
 import { listProducts } from "@/lib/catalogue/storefront";
 import { categoryMeta } from "@/lib/categoryMeta";
 
@@ -19,10 +19,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const meta = categoryMeta.find((c) => c.slug === category);
   if (!meta) return { title: "Category not found | RCW Store" };
 
-  const live = (await getLiveCategorySlugs()).has(meta.slug);
+  const live = new Set<string>(await getLiveSlugsForChrome());
   return {
     title: `${meta.name} | RCW Store`,
-    description: live
+    description: live.has(meta.slug)
       ? `Shop ${meta.name} at RCW Store. Great deals and cheap prices, proudly South African.`
       : `${meta.name} is coming soon to RCW Store.`,
   };
@@ -33,13 +33,14 @@ export default async function CategoryPage({ params }: Props) {
   const meta = categoryMeta.find((c) => c.slug === category);
   if (!meta) notFound();
 
-  // The database decides what is live, so switching a category on there is enough.
-  const liveSlugs = await getLiveCategorySlugs();
-  const live = liveSlugs.has(meta.slug);
-  const items = live
+  // The database decides what is live, so the admin switch changes the site.
+  const live = new Set<string>(await getLiveSlugsForChrome());
+  const isLive = live.has(meta.slug);
+
+  const items = isLive
     ? await listProducts({ categorySlug: meta.slug, limit: 100 })
     : [];
-  const liveCategories = categoryMeta.filter((c) => liveSlugs.has(c.slug));
+  const liveCategories = categoryMeta.filter((c) => live.has(c.slug));
 
   return (
     <main className="min-h-screen">
@@ -52,7 +53,7 @@ export default async function CategoryPage({ params }: Props) {
           {meta.name}
         </h1>
 
-        {!live ? (
+        {!isLive ? (
           <section className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
             <h2 className="text-lg font-semibold text-[var(--text)]">
               Coming soon

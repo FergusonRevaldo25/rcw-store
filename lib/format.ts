@@ -1,5 +1,6 @@
-// 549 -> "R549", 249.5 -> "R249.50"
-export function formatRand(amount: number): string {
-  const n = Math.round(amount * 100) / 100;
-  return Number.isInteger(n) ? `R${n}` : `R${n.toFixed(2)}`;
+// Whole Rand show as R549, anything else as R249.50.
+// Rounds to cents first so 19.99 * 3 never prints as 59.97000000000001.
+export function formatRand(n: number): string {
+  const r = Math.round(n * 100) / 100;
+  return `R${Number.isInteger(r) ? r : r.toFixed(2)}`;
 }

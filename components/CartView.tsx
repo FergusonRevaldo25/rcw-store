@@ -1,5 +1,6 @@
-"use client";
+﻿"use client";
 
+import { formatRand } from "@/lib/format";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/CartProvider";
@@ -78,11 +79,11 @@ export default function CartView() {
                         {item.name}
                       </Link>
                       <p className="mt-0.5 text-sm text-[var(--muted)]">
-                        R{item.price} each
+                        {formatRand(item.price)} each
                       </p>
                     </div>
                     <p className="shrink-0 font-bold text-[var(--text)]">
-                      R{item.price * item.qty}
+                      {formatRand(item.price * item.qty)}
                     </p>
                   </div>
 
@@ -183,7 +184,7 @@ export default function CartView() {
             <dt className="text-[var(--muted)]">
               Subtotal ({count} {count === 1 ? "item" : "items"})
             </dt>
-            <dd className="font-medium text-[var(--text)]">R{subtotal}</dd>
+            <dd className="font-medium text-[var(--text)]">{formatRand(subtotal)}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-[var(--muted)]">Delivery</dt>
@@ -194,7 +195,7 @@ export default function CartView() {
         <div className="mt-4 flex justify-between border-t border-[var(--border)] pt-4">
           <span className="font-semibold text-[var(--text)]">Total</span>
           <span className="text-lg font-bold text-[var(--text)]">
-            R{subtotal}
+            {formatRand(subtotal)}
           </span>
         </div>
 
@@ -220,3 +221,4 @@ export default function CartView() {
     </div>
   );
 }
+
