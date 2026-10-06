@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Fill from "@/components/Fill";
 import InfoPage, { Section } from "@/components/InfoPage";
+import { FREE_DELIVERY_OVER } from "@/lib/config";
 import { formatRand } from "@/lib/format";
 import { SITE } from "@/lib/site";
 
@@ -37,14 +38,7 @@ export default function ShippingPage() {
 
       <Section title="Delivery fees">
         <p>The fee for your postcode is shown at checkout, before you pay.</p>
-        <p>
-          Free delivery:{" "}
-          {SITE.freeDeliveryOver === null ? (
-            <Fill value={null} label="free delivery threshold (or delete this line)" />
-          ) : (
-            <>on orders over {formatRand(SITE.freeDeliveryOver)}.</>
-          )}
-        </p>
+        <p>Free delivery on orders over {formatRand(FREE_DELIVERY_OVER)}.</p>
       </Section>
 
       <Section title="Problems with a delivery">
