@@ -1,57 +1,156 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Fill from "@/components/Fill";
-import InfoPage, { Section } from "@/components/InfoPage";
+import { Section } from "@/components/InfoPage";
+import LegalPage, { bullets } from "@/components/LegalPage";
+import { LEGAL } from "@/lib/legal";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | RCW Store",
-  description: "Terms for using and buying from RCW Store.",
+  title: "Terms and conditions | RCW Store",
+  description: "The terms for using RCW Store and buying from it.",
 };
 
-const review = "mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-[var(--text)]";
+const link =
+  "rounded text-[var(--text)] underline underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-500/70";
 
 export default function TermsPage() {
   return (
-    <InfoPage title="Terms & Conditions" intro="Draft terms for using RCW Store and placing an order.">
-      <p className={review}>This is a working draft with business details and commercial terms still to confirm. Have a South African lawyer review it before accepting orders.</p>
-
-      <Section title="The store operator">
-        <p>RCW Store is operated by <Fill value={SITE.legalName} label="registered legal name" />, trading as RCW Store, registration number <Fill value={SITE.registrationNumber} label="company or business registration number" />. Contact: <Fill value={SITE.email} label="customer contact email" />; address: <Fill value={SITE.address} label="business address" />.</p>
+    <LegalPage
+      title="Terms and conditions"
+      intro="By using RCW Store or placing an order, you agree to these terms. Please read them together with our privacy policy, shipping info and returns page."
+    >
+      <Section title="About us">
+        <p>
+          RCW Store is run by{" "}
+          <Fill value={SITE.legalName} label="registered name" />. Our contact
+          details and address are on the{" "}
+          <Link href="/contact" className={link}>
+            contact page
+          </Link>
+          .
+        </p>
       </Section>
 
-      <Section title="Using the store">
-        <p>Use the store lawfully and provide accurate information when creating an account or placing an order. Keep your account credentials secure and tell us promptly if you suspect unauthorised access. We may restrict access where reasonably needed to protect the store, customers or legal rights.</p>
+      <Section title="Using the site and your account">
+        <ul className={bullets}>
+          <li>Give us correct information and keep your password safe.</li>
+          <li>You are responsible for what happens under your account.</li>
+          <li>
+            We may suspend an account that is used to commit fraud or abuse the
+            site.
+          </li>
+        </ul>
       </Section>
 
-      <Section title="Products, prices and orders">
-        <p>Product descriptions, availability, prices, delivery charges and applicable taxes should be shown before an order is placed. An order is subject to availability and payment authorisation. We will send an order confirmation using the contact details supplied. If a listing or price contains an obvious error, we will contact you to resolve it in accordance with applicable consumer law.</p>
-        <p>Currency: South African rand (ZAR). VAT status and price treatment: <Fill value={SITE.vatNumber} label="confirm VAT registration and whether prices include VAT" />.</p>
+      <Section title="Products and prices">
+        <p>
+          All prices are in South African Rand (ZAR).{" "}
+          {LEGAL.vatRegistered === null ? (
+            <Fill value={null} label="VAT statement" where="lib/legal.ts (vatRegistered)" />
+          ) : LEGAL.vatRegistered ? (
+            <>
+              Prices include VAT.{" "}
+              {SITE.vatNumber ? (
+                <>Our VAT number is {SITE.vatNumber}.</>
+              ) : (
+                <Fill value={null} label="VAT number" />
+              )}
+            </>
+          ) : (
+            <>We are not registered for VAT, so no VAT is added to prices.</>
+          )}
+        </p>
+        <p>
+          We take care to show correct prices and descriptions. If we find a
+          price or stock error on an order, we will contact you and you may
+          choose to confirm or cancel it. If you cancel, you get a full refund.
+        </p>
       </Section>
 
-      <Section title="Payment and delivery">
-        <p>Available payment methods and any delivery charges will be shown at checkout before you confirm payment. Delivery coverage, courier, timing and fees are described on our <Link className="underline" href="/shipping">Shipping Info</Link> page and at checkout. Payment-provider terms may also apply.</p>
+      <Section title="Placing an order">
+        <p>
+          An order is accepted once we receive your payment and your order
+          number is shown to you. We may cancel an order if an item is out of
+          stock or cannot be delivered. If we do, you get a full refund.
+        </p>
       </Section>
 
-      <Section title="Returns, cancellations and consumer rights">
-        <p>Our <Link className="underline" href="/returns">Returns &amp; Refunds</Link> page explains how to contact us. These terms do not limit rights that cannot lawfully be excluded, including rights under South African consumer law.</p>
+      <Section title="Payment">
+        <p>
+          Payments are processed securely by{" "}
+          <Fill value={LEGAL.paymentProviders} label="payment provider" where="lib/legal.ts" />
+          . We do not see or store your card details.
+        </p>
+      </Section>
+
+      <Section title="Delivery, returns and refunds">
+        <p>
+          See our{" "}
+          <Link href="/shipping" className={link}>
+            shipping info
+          </Link>{" "}
+          and{" "}
+          <Link href="/returns" className={link}>
+            returns and refunds
+          </Link>{" "}
+          pages. They form part of these terms. Nothing in these terms limits
+          your rights under South African consumer law.
+        </p>
       </Section>
 
       <Section title="Digital products">
-        <p>Where a product is digital, the product page or checkout must explain delivery, permitted use, any licence restrictions and applicable cancellation or refund conditions before purchase. Product-specific licence terms: <Fill value={null} label="confirm digital product licence terms" />.</p>
+        <p>
+          A digital product is licensed to you, not sold. Unless the product
+          page says otherwise, you may use it for your own personal or business
+          purposes, but you may not resell, share or redistribute it.
+        </p>
       </Section>
 
-      <Section title="Intellectual property and third-party services">
-        <p>Store content and branding may not be copied or used commercially without permission, except where the law allows. Payment and other third-party services may be governed by their own terms.</p>
+      <Section title="Our content">
+        <p>
+          The RCW Store name, logo, text and images belong to us or our
+          licensors. You may not copy or reuse them without our permission.
+        </p>
       </Section>
 
-      <Section title="Liability, complaints and governing law">
-        <p>Nothing in these terms excludes liability or consumer rights that cannot be excluded under applicable law. Governing law and dispute process: <Fill value={null} label="lawyer to confirm governing-law and dispute clauses" />. Send questions or complaints to <Fill value={SITE.email} label="customer contact email" />.</p>
+      <Section title="Our responsibility">
+        <p>
+          To the extent the law allows, we are not responsible for indirect or
+          consequential loss, or for problems caused by things outside our
+          control. Nothing in these terms excludes liability that cannot be
+          excluded by law.
+        </p>
       </Section>
 
-      <Section title="Updates">
-        <p>We may revise these terms by publishing an updated version here. Last updated: <Fill value={null} label="terms approval date" />.</p>
+      <Section title="Your information">
+        <p>
+          How we handle your personal information is explained in our{" "}
+          <Link href="/privacy" className={link}>
+            privacy policy
+          </Link>{" "}
+          and{" "}
+          <Link href="/cookies" className={link}>
+            cookie policy
+          </Link>
+          .
+        </p>
       </Section>
-    </InfoPage>
+
+      <Section title="Complaints and governing law">
+        <p>
+          Please contact us first and we will try to put things right. You may
+          also take a complaint to the National Consumer Commission. These terms
+          are governed by the laws of the Republic of South Africa.
+        </p>
+      </Section>
+
+      <Section title="Changes">
+        <p>
+          We may update these terms. The version in force when you place an
+          order applies to that order.
+        </p>
+      </Section>
+    </LegalPage>
   );
 }

@@ -108,7 +108,7 @@ export default async function OrdersPage({
             #{r.number}
           </Link>
         ) : (
-          <span className="font-medium">#{r.number}</span>
+          <Link href={`/admin/orders/${r.id}`} className={`rounded font-medium underline underline-offset-2 ${focus}`}>#{r.number}</Link>
         ),
     },
     { key: "date", label: "Date", render: (r) => dateTime(r.createdAt) },

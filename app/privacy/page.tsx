@@ -1,55 +1,168 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Fill from "@/components/Fill";
-import InfoPage, { Section } from "@/components/InfoPage";
+import { Section } from "@/components/InfoPage";
+import LegalPage, { bullets } from "@/components/LegalPage";
+import { LEGAL } from "@/lib/legal";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | RCW Store",
-  description: "How RCW Store handles personal information under POPIA.",
+  title: "Privacy policy | RCW Store",
+  description: "How RCW Store collects, uses and protects your personal information.",
 };
-
-const review = "mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-[var(--text)]";
 
 export default function PrivacyPage() {
   return (
-    <InfoPage title="Privacy Policy" intro="Draft for review. This page explains how RCW Store handles personal information in connection with the store.">
-      <p className={review}>This draft contains operational assumptions and placeholders. Have a South African privacy lawyer review it, confirm actual data flows and retention periods, and complete the highlighted fields before launch.</p>
-
+    <LegalPage
+      title="Privacy policy"
+      intro="This policy explains how RCW Store collects, uses and protects your personal information, in line with the Protection of Personal Information Act (POPIA)."
+    >
       <Section title="Who is responsible">
-        <p>RCW Store is the responsible party for personal information processed through this store. Legal name: <Fill value={SITE.legalName} label="registered legal name" />. Address: <Fill value={SITE.address} label="business address" />. Privacy contact: <Fill value={SITE.email} label="privacy contact email" />. Information Officer: <Fill value={SITE.informationOfficer} label="Information Officer name and contact details" />.</p>
+        <p>
+          The responsible party is{" "}
+          <Fill value={SITE.legalName} label="registered name" />, trading as{" "}
+          {SITE.name}.
+        </p>
+        <p>
+          Our information officer is{" "}
+          <Fill value={SITE.informationOfficer} label="information officer" />.
+          You can reach us at <Fill value={SITE.email} label="support email" />.
+        </p>
       </Section>
 
-      <Section title="Information we handle">
-        <p>Depending on how you use the store, we may handle account details such as your name and email address; order contact details and order contents; seller or partner application details; support messages; and technical information used for account security, such as session, browser and IP information. The fields requested for a particular service should be limited to what is needed to provide it.</p>
-        <p>Payment details are submitted to the payment provider selected at checkout. Confirm with each provider exactly what information it receives and whether any payment credentials are stored by RCW Store.</p>
+      <Section title="What we collect">
+        <ul className={bullets}>
+          <li>
+            <strong>Account details:</strong> your name, email address and
+            password. Your password is stored in a protected form, never as
+            plain text.
+          </li>
+          <li>
+            <strong>Order details:</strong> your name, email address, phone
+            number and delivery address when you place an order.
+          </li>
+          <li>
+            <strong>Payment details:</strong> card and bank details are entered
+            on our payment provider&apos;s secure page. We do not see or store
+            them. We keep only the payment status and a reference.
+          </li>
+          <li>
+            <strong>Technical details:</strong> your IP address and the type of
+            browser and device you use, kept with your sign-in sessions for
+            security.
+          </li>
+          <li>
+            <strong>Saved in your browser:</strong> your cart, favourites,
+            recently viewed items and theme choice. See our cookie policy.
+          </li>
+          <li>
+            <strong>Messages:</strong> anything you send us when you contact us.
+          </li>
+        </ul>
       </Section>
 
       <Section title="Why we use it">
-        <p>We use information to create and secure accounts, process orders and returns, provide customer support, administer seller applications, prevent fraud and misuse, maintain business records, meet legal obligations, and communicate service updates. We will send promotional messages only where permitted by law and will provide a way to opt out.</p>
+        <ul className={bullets}>
+          <li>To create and manage your account.</li>
+          <li>To take payment for, pack, deliver and support your orders.</li>
+          <li>To prevent fraud and keep the site secure.</li>
+          <li>To keep records that the law requires, such as tax and consumer records.</li>
+          <li>To answer your questions and complaints.</li>
+        </ul>
+        <p>
+          We do not send marketing messages at the moment. If we start, we will
+          ask for your consent first, and you can opt out at any time.
+        </p>
       </Section>
 
-      <Section title="Service providers and international processing">
-        <p>The store uses Neon for its hosted PostgreSQL database; the project is configured for the AWS Frankfurt region. Vercel provides application hosting and public Blob storage for product images. The store also integrates PayFast and Ozow payment flows. These providers may process information as service providers or independent parties according to their own terms and the services enabled. Review their current privacy terms and data-processing arrangements before launch.</p>
-        <p>Some providers or their subprocessors may process information outside South Africa. Confirm the locations and safeguards for each enabled service, and document any cross-border transfers required by POPIA.</p>
+      <Section title="On what basis">
+        <p>
+          We use your information where it is needed to carry out a contract
+          with you (such as an order), where the law requires it, where it is
+          in your or our legitimate interests (such as keeping the site
+          secure), or where you have given your consent.
+        </p>
       </Section>
 
-      <Section title="Retention and security">
-        <p>We keep information only for as long as needed for the purpose collected, account and transaction administration, dispute handling, and applicable legal recordkeeping duties. Retention periods by information type: <Fill value={null} label="retention schedule" />. We use reasonable safeguards, but no internet transmission or storage system can be guaranteed completely secure. If a security compromise occurs, we will take steps required by applicable law.</p>
+      <Section title="Who we share it with">
+        <p>
+          We do not sell your personal information. We share it only with
+          service providers who help us run the store, and only what they need:
+        </p>
+        <ul className={bullets}>
+          <li>Website hosting: Vercel.</li>
+          <li>Database: Neon, hosted in Frankfurt, Germany.</li>
+          <li>
+            Payments:{" "}
+            <Fill value={LEGAL.paymentProviders} label="payment provider" where="lib/legal.ts" />.
+          </li>
+          <li>
+            Delivery: <Fill value={SITE.courier} label="courier" /> receives
+            your name, phone number and delivery address to deliver your order.
+          </li>
+          <li>Authorities, where the law requires us to share information.</li>
+        </ul>
       </Section>
 
-      <Section title="Your choices and rights">
-        <p>Subject to applicable law, you may ask to access or correct personal information, object to certain processing, request deletion where appropriate, or withdraw consent where processing relies on consent. You may also complain to the Information Regulator. Contact us at <Fill value={SITE.email} label="privacy contact email" />. For more information or to make a complaint, visit the <a className="underline" href="https://inforegulator.org.za/">Information Regulator</a>.</p>
+      <Section title="Information outside South Africa">
+        <p>
+          Some of our service providers store or process information outside
+          South Africa. For example, our database is in Frankfurt, Germany.
+          Where this happens, we rely on the conditions that POPIA allows for
+          such transfers.
+        </p>
+      </Section>
+
+      <Section title="How long we keep it">
+        <p>
+          We keep information only for as long as we need it for the purposes
+          above, or as long as the law requires. Order and tax records are kept
+          for the period South African law requires. You can ask us to delete
+          your account at any time.
+        </p>
+      </Section>
+
+      <Section title="How we protect it">
+        <ul className={bullets}>
+          <li>The site uses encrypted connections.</li>
+          <li>Staff accounts require two-factor authentication, and access is limited by role.</li>
+          <li>Changes to orders, refunds and accounts are recorded in an audit log.</li>
+        </ul>
+        <p>
+          If a security breach affects your information, we will tell you and
+          the Information Regulator as the law requires.
+        </p>
+      </Section>
+
+      <Section title="Your rights">
+        <p>You may ask us to:</p>
+        <ul className={bullets}>
+          <li>tell you what personal information we hold about you;</li>
+          <li>correct information that is wrong or out of date;</li>
+          <li>delete information we no longer need;</li>
+          <li>stop using your information for a purpose you object to; and</li>
+          <li>withdraw consent you gave us.</li>
+        </ul>
+        <p>
+          To make a request, email <Fill value={SITE.email} label="support email" />.
+          We may need to confirm who you are first. If you are not happy with
+          how we handle your information, you can complain to the Information
+          Regulator (South Africa).
+        </p>
       </Section>
 
       <Section title="Children">
-        <p>The store is intended for people able to enter into transactions under applicable law. If a service collects personal information from a child, the required parent or competent-person authorisation and safeguards must be confirmed before that service is offered.</p>
+        <p>
+          Our store is not meant for people under 18, and we do not knowingly
+          collect their information.
+        </p>
       </Section>
 
-      <Section title="Changes and related information">
-        <p>We may update this policy when our services or legal requirements change. The current version will appear on this page. See also our <Link className="underline" href="/cookies">Cookie Policy</Link> and <Link className="underline" href="/terms">Terms &amp; Conditions</Link>.</p>
-        <p>Last updated: <Fill value={null} label="policy approval date" />.</p>
+      <Section title="Changes to this policy">
+        <p>
+          We may update this policy. The date at the top shows when it last
+          changed.
+        </p>
       </Section>
-    </InfoPage>
+    </LegalPage>
   );
 }

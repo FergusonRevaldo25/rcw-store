@@ -43,6 +43,13 @@
       "when": 1791179978237,
       "tag": "0005_powerful_scorpion",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791264966821,
+      "tag": "0006_medical_solo",
+      "breakpoints": true
     }
   ]
 }

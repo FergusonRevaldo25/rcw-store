@@ -103,8 +103,23 @@ export const orders = pgTable(
     vatCents: integer("vat_cents").notNull().default(0),
     // True: vatCents is already inside the total. False: it is added on top.
     vatIncluded: boolean("vat_included").notNull().default(true),
+    // Online orders: delivery is added to the subtotal.
+    deliveryCents: integer("delivery_cents").notNull().default(0),
     totalCents: integer("total_cents").notNull(),
     note: text("note"),
+    // Online orders only. Till orders leave these empty.
+    // A long random code, so a guest can open their own order without an account.
+    publicToken: text("public_token").unique(),
+    shippingName: text("shipping_name"),
+    shippingPhone: text("shipping_phone"),
+    shippingAddress1: text("shipping_address1"),
+    shippingAddress2: text("shipping_address2"),
+    shippingSuburb: text("shipping_suburb"),
+    shippingCity: text("shipping_city"),
+    shippingProvince: text("shipping_province"),
+    shippingPostalCode: text("shipping_postal_code"),
+    trackingRef: text("tracking_ref"),
+    shippedAt: timestamp("shipped_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -125,6 +140,7 @@ export const orders = pgTable(
       sql`${t.discountCents} >= 0 and ${t.discountCents} <= ${t.subtotalCents}`
     ),
     check("orders_vat_nonneg", sql`${t.vatCents} >= 0`),
+    check("orders_delivery_nonneg", sql`${t.deliveryCents} >= 0`),
     check("orders_total_nonneg", sql`${t.totalCents} >= 0`),
     check(
       "orders_pos_has_session",
