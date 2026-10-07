@@ -3,9 +3,14 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { twoFactor } from "better-auth/plugins";
 import { db } from "../db";
+import { cleanUrl } from "./url";
 
 // Server-only. Check the Better Auth docs if an option name has changed.
 export const auth = betterAuth({
+  baseURL:
+    cleanUrl(process.env.BETTER_AUTH_URL) ??
+    cleanUrl(process.env.NEXT_PUBLIC_SITE_URL) ??
+    "http://localhost:3000",
   database: drizzleAdapter(db, { provider: "pg" }),
   emailAndPassword: { enabled: true },
   // Limits apply in production. Per-instance memory for now (see notes).
@@ -44,3 +49,4 @@ export const auth = betterAuth({
   },
   plugins: [twoFactor({ issuer: "RCW Store" }), nextCookies()],
 });
+
