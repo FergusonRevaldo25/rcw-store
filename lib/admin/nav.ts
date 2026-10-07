@@ -1,4 +1,4 @@
-import type { PermissionKey } from "@/lib/rbac/permissions";
+﻿import type { PermissionKey } from "@/lib/rbac/permissions";
 
 export type NavItem = {
   label: string;
@@ -18,7 +18,7 @@ export const ADMIN_NAV: NavGroup[] = [
     title: "Catalogue",
     items: [
       { label: "Products", href: "/admin/products", permission: "products:view", built: true },
-      { label: "Categories", href: "/admin/categories", permission: "categories:view", built: false },
+      { label: "Categories", href: "/admin/categories", permission: "categories:view", built: true },
       { label: "Digital files", href: "/admin/digital-files", permission: "digital_files:view", built: false },
       { label: "Inventory", href: "/admin/inventory", permission: "inventory:view", built: true },
     ],

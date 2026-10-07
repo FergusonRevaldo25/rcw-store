@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, inArray, lte, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { orderItems, orders, payments, products } from "@/lib/db/schema";
+import { orderItems, orders, payments, products, refunds } from "@/lib/db/schema";
 
 const TZ = "Africa/Johannesburg";
 export const LOW_STOCK_AT = 10;
@@ -17,11 +17,12 @@ export function addDays(iso: string, n: number) {
 
 export type Day = { day: string; cents: number; orders: number };
 
-// The last 31 days, with empty days filled in as zero.
+// The last 31 days. Sales minus refunds paid out that day. Empty days are zero.
 export async function dailySales(): Promise<Day[]> {
   const today = saToday();
   const start = addDays(today, -30);
   const dayExpr = sql<string>`to_char((${orders.createdAt} at time zone 'Africa/Johannesburg')::date, 'YYYY-MM-DD')`;
+  const refundDay = sql<string>`to_char((${refunds.paidAt} at time zone 'Africa/Johannesburg')::date, 'YYYY-MM-DD')`;
 
   const rows = await db
     .select({
@@ -38,11 +39,30 @@ export async function dailySales(): Promise<Day[]> {
     )
     .groupBy(dayExpr);
 
+  const back = await db
+    .select({
+      day: refundDay,
+      cents: sql<number>`coalesce(sum(${refunds.amountCents}), 0)::int`,
+    })
+    .from(refunds)
+    .where(
+      and(
+        eq(refunds.status, "paid"),
+        sql`(${refunds.paidAt} at time zone 'Africa/Johannesburg')::date >= ${start}::date`
+      )
+    )
+    .groupBy(refundDay);
+
   const map = new Map(rows.map((r) => [r.day, r]));
+  const refunded = new Map(back.map((r) => [r.day, r.cents]));
   return Array.from({ length: 31 }, (_, i) => {
     const day = addDays(start, i);
     const r = map.get(day);
-    return { day, cents: r?.cents ?? 0, orders: r?.orders ?? 0 };
+    return {
+      day,
+      cents: (r?.cents ?? 0) - (refunded.get(day) ?? 0),
+      orders: r?.orders ?? 0,
+    };
   });
 }
 

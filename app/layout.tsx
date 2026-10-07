@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
@@ -18,7 +18,19 @@ const geistMono = Geist_Mono({
 
 // PLACEHOLDER: set NEXT_PUBLIC_SITE_URL in .env.local (and on your host)
 // to your real domain so share images get absolute URLs.
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+function resolveSiteUrl(): string {
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL ?? "")
+    .trim()
+    .replace(/^["']|["']$/g, "");
+  if (!raw) return "http://localhost:3000";
+  const full = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    return new URL(full).toString().replace(/\/$/, "");
+  } catch {
+    return "http://localhost:3000";
+  }
+}
+const siteUrl = resolveSiteUrl();
 
 const title = "RCW Store | Great deals, proudly South African";
 const description =

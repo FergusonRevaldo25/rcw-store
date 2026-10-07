@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { and, count, eq } from "drizzle-orm";
 import Link from "next/link";
 import { DayBars, HBars } from "@/components/admin/charts";
@@ -154,7 +154,7 @@ export default async function AdminHome({
           <section aria-labelledby="sales-h">
             <h2 id="sales-h" className="mb-1 text-lg font-semibold text-[var(--text)]">Sales</h2>
             <p className="mb-4 text-sm text-[var(--muted)]">
-              Paid and fulfilled orders, before refunds, in South African time.
+              Paid and fulfilled orders, minus refunds paid out, in South African time.
             </p>
             <div className="grid gap-4 sm:grid-cols-3">
               <StatCard label="Today" value={rand(todayCents)} href="/admin/orders" spark={spark} />

@@ -1,3 +1,4 @@
+﻿import { and, eq, gte, sql } from "drizzle-orm";
 import { auditValues } from "@/lib/audit/log";
 import { db } from "@/lib/db";
 import { auditLog } from "@/lib/db/schema";
@@ -19,6 +20,20 @@ export async function POST(req: Request) {
     return reply({ ok: false, error: "You do not have permission to add product images." }, 403);
   if (!storageConfigured())
     return reply({ ok: false, error: "Image storage is not set up yet. Ask an admin to connect it." }, 503);
+
+  // At most 30 saved images per person per 10 minutes (counted from the audit log).
+  const [{ n: recent }] = await db
+    .select({ n: sql<number>`count(*)::int` })
+    .from(auditLog)
+    .where(
+      and(
+        eq(auditLog.actorId, staff.user.id),
+        eq(auditLog.action, "product.image.add"),
+        gte(auditLog.createdAt, new Date(Date.now() - 10 * 60_000))
+      )
+    );
+  if (recent >= 30)
+    return reply({ ok: false, error: "Too many images in a short time. Wait a few minutes and try again." }, 429);
 
   let bytes: Buffer | null = null;
   let source = "";

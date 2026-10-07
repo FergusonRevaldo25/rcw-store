@@ -10,7 +10,7 @@ import { db } from "@/lib/db";
 import { auditLog, categories } from "@/lib/db/schema";
 import { requirePermission } from "@/lib/rbac/guard";
 
-// Switches a category on or off for the public site.
+// Switches a category on or off the public storefront.
 export async function setCategoryLive(fd: FormData): Promise<void> {
   const staff = await requirePermission("categories:edit");
   const id = String(fd.get("categoryId") ?? "");
@@ -27,7 +27,7 @@ export async function setCategoryLive(fd: FormData): Promise<void> {
       .for("update");
     if (!c) return "missing";
     if (!inScope(visible, c.id)) return "scope";
-    if (c.live === live) return "unchanged";
+    if (c.live === live) return "same";
 
     await tx.update(categories).set({ live }).where(eq(categories.id, id));
     await tx.insert(auditLog).values(
@@ -37,13 +37,13 @@ export async function setCategoryLive(fd: FormData): Promise<void> {
         "category",
         id,
         { live: c.live },
-        { live, slug: c.slug }
+        { live, name: c.name }
       )
     );
     return live ? "on" : "off";
   });
 
   revalidatePath("/admin/categories");
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   redirect(`/admin/categories?notice=${outcome}`);
 }
